@@ -1,7 +1,9 @@
-import React from "react";
+import React, {useState} from "react";
 
 function QuestionItem({ question, deleteQuestion }) {
   const { id, prompt, answers, correctIndex } = question;
+  const [cAnswer, setCAnswer] = useState(correctIndex);
+
 
   function handleDelete() {
     fetch(`http://localhost:4000/questions/${id}`, {
@@ -16,13 +18,24 @@ function QuestionItem({ question, deleteQuestion }) {
     </option>
   ));
 
+  function updateAnswer(e) {
+    setCAnswer(e.target.value)
+    fetch(`http://localhost:4000/questions/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({"correctIndex": e.target.value})
+    })
+  }
+
   return (
     <li>
       <h4>Question {id}</h4>
       <h5>Prompt: {prompt}</h5>
       <label>
         Correct Answer:
-        <select defaultValue={correctIndex}>{options}</select>
+        <select onChange={e => updateAnswer(e)} defaultValue={cAnswer}>{options}</select>
       </label>
       <button onClick={handleDelete}>Delete Question</button>
     </li>
